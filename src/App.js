@@ -1,59 +1,31 @@
-import React, { useState, useEffect } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { Container, AppBar, Typography, Grow, Grid } from '@material-ui/core';
-
-//images
-import memories from './images/memories.png';
+import React from 'react';
+import { Container } from '@material-ui/core';
+import { BrowserRouter as Router, Routes, Route , Navigate} from 'react-router-dom';
 
 //components
+import NavBar from './components/Navbar';
+import Home from './components/Home';
+import Auth from './components/Auth'
+import PostDetails from './components/PostDetails/PostDetails';
 
-import Posts from './components/Posts';
-import Form from './components/Form'
-
-//makeStyles
-import useStyles from './App.styles';
-
-//actions
-import { getPosts } from './actions/post';
 
 const App = () => {
-    const [currentId, setCurrentId] = useState(null);
-
-    const classes = useStyles();
-
-    const dispatch = useDispatch();
-
-    const posts = useSelector(state => state.posts);
-
-    useEffect(() => {
-
-    }, [posts])
-
-    useEffect(() => {
-        dispatch(getPosts());
-    }, [currentId, dispatch], )
+    
+    const user = JSON.parse(localStorage.getItem('profile'));
 
     return (
-        <Container maxwidth="lg">
-            <AppBar className={ classes.appBar } position='static' color='inherit'>
-                <Typography  className={classes.heading} variant='h3' align='center'>
-                    Memories
-                </Typography>
-                <img className={classes.image} src={memories} alt='memories' height='60' />
-            </AppBar>
-            <Grow in>
-                <Container>
-                    <Grid container className={classes.mainContainer} justifyContent='space-between' alignItems='stretch' spacing={3}>
-                        <Grid xs={12} sm={12} lg={7} md={7}>
-                            <Posts setCurrentId={setCurrentId} />
-                        </Grid>
-                        <Grid item xs={12} sm={8} lg={4} md={4}>
-                            <Form currentId={ currentId } setCurrentId={setCurrentId} />
-                        </Grid>
-                    </Grid>
-                </Container>
-            </Grow>
-        </Container>
+        <Router>
+            <Container maxwidth="xl">
+                <NavBar />
+                <Routes>
+                    <Route path='/' exact element={ <Navigate to='/posts' />} />
+                    <Route path='/posts' exact element={<Home />} />
+                    <Route path='/posts/search' exact element={<Home />} />
+                    <Route path='/posts/:id' element={<PostDetails />} />
+                    <Route path='/auth' element={(!user ? <Auth /> : <Navigate to='/posts'  />)} />
+                </Routes>
+            </Container>
+        </Router>
     )
 }
 
